@@ -1,2 +1,4 @@
 #Demo Test Git
-Test project for learning Git with Phyton and PyCharm.
+Project for getting to know Git with Phyton and PyCharm from:
+
+![alt text](http://gpw.pwr.edu.pl/wp-content/uploads/2014/05/logo-PWr-kolor-poziom.png)
