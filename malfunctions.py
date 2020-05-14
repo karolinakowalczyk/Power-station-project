@@ -7,6 +7,7 @@ class Malfunctions:
         self.days = self.randomize_days()
         self.hours = self.randomize_hours()
         self.minutes = self.randomize_minutes()
+        self.time = self.count_time()
 
     def get_malname(self):
         return self.name
@@ -44,15 +45,20 @@ class Malfunctions:
         else:
             print("I can't randomize time for unknown status.")
 
+    def count_time(self):
+        return self.days*24*60 + self.hours*60 + self.minutes
+
+    def get_time(self):
+        return self.time
+
 
 mal1 = Malfunctions("Zerwanie linii", "easy")
 mal2 = Malfunctions("Zerwanie 3 linii", "medium")
-mal3 = Malfunctions("Zerwanie więcej niż 3 linii", "serious")
+mal3 = Malfunctions("Zerwanie więcej niż 3 linii", "easy")
 mal4 = Malfunctions("Awaria sieciowa", "easy")
 mal5 = Malfunctions("Awaria zasilania", "medium")
-mal6 = Malfunctions("Brak surowców", "serious")
-mal7 = Malfunctions("Wybuch reaktora xD", "serious")
-
+mal6 = Malfunctions("Brak surowców", "easy")
+mal7 = Malfunctions("Wybuch reaktora xD", "easy")
 
 mal_list = []
 mal_list.append(mal1)
