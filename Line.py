@@ -23,7 +23,6 @@ class Pole:
     """function uses predefined list of malfunctions and get
     a random one to happen on this pole. It changes its status accordingly
     to how serious the malfunction is"""
-    #TODO: Polaczyc z kodem Karoliny i losowac awarie
     def set_random_malfunction(self):
         malf = malfunctions.mal_list[random.randint(0,6)]
         self.malfunction = malf

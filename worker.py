@@ -27,7 +27,7 @@ class Worker:
 
     # Workers are sometimes tired, sometimes excited at work. Their efficiency should vary from day to day.
     def randomize_eff(self):
-        self.eff += random.randint(0, 20)
+        self.eff += random.randint(-5, 5)
 
     # Method should be called when the worker is expected to work on a particular malfunction.
     def repair(self, mal: Malfunctions):

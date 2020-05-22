@@ -16,7 +16,7 @@ class PowerPlant:
 
     def generateWorkers(self, count: int):
         for i in range(0, count):
-            self.workers.append(Worker(i, random.randint(90,110), random.randint(20,40)))
+            self.workers.append(Worker(i, random.randint(80,120), random.randint(20,40)))
 
     def findIdleWorker(self):
         for w in self.workers:
