@@ -58,7 +58,7 @@ mal3 = Malfunctions("Zerwanie więcej niż 3 linii", "easy")
 mal4 = Malfunctions("Awaria sieciowa", "easy")
 mal5 = Malfunctions("Awaria zasilania", "medium")
 mal6 = Malfunctions("Brak surowców", "easy")
-mal7 = Malfunctions("Wybuch reaktora xD", "easy")
+mal7 = Malfunctions("Wybuch reaktora xD", "serious")
 
 mal_list = []
 mal_list.append(mal1)
