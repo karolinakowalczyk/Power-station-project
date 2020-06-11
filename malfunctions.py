@@ -1,70 +1,50 @@
-from random import randint
+from Line import Line
+import malfunctions
+import random
+from worker import Worker
+from worker import Status
 
-class Malfunctions:
-    def __init__(self, name, status):
-        self.name = name
-        self.status = status
-        self.days = self.randomize_days()
-        self.hours = self.randomize_hours()
-        self.minutes = self.randomize_minutes()
-        self.time = self.count_time()
+class PowerPlant:
+    def __init__(self):
+        self.lines = list()
+        self.workers = list()
+        self.balance = 5000
 
-    def get_malname(self):
-        return self.name
+    def generateLines(self, count: int, lineSize: int):
+        for i in range(0, count):
+            self.lines.append(Line(lineSize))
 
-    def get_status(self):
-        return self.status
+    def generateWorkers(self, count: int):
+        for i in range(0, count):
+            self.workers.append(Worker(i, random.randint(80,120), random.randint(20,40)))
 
-    def get_days(self):
-        return self.days
+    def findIdleWorker(self):
+        for w in self.workers:
+            if w.status == Status.IDLE:
+                return w
+        return None
 
-    def get_hours(self):
-        return self.hours
-
-    def get_minutes(self):
-        return self.minutes
-
-    def randomize_minutes(self):
-        minutes = randint(0, 59)
-        return minutes
-
-    def randomize_hours(self):
-        hours = randint(0, 23)
-        return hours
-
-    def randomize_days(self):
-        if self.status == "easy":
-            days = 0
-            return days
-        elif self.status == "medium":
-            days = randint(1, 3)
-            return days
-        elif self.status == "serious":
-            days = randint(4, 6)
-            return days
-        else:
-            print("I can't randomize time for unknown status.")
-
-    def count_time(self):
-        return self.days*24*60 + self.hours*60 + self.minutes
-
-    def get_time(self):
-        return self.time
-
-
-mal1 = Malfunctions("Zerwanie linii", "easy")
-mal2 = Malfunctions("Zerwanie 3 linii", "medium")
-mal3 = Malfunctions("Zerwanie więcej niż 3 linii", "easy")
-mal4 = Malfunctions("Awaria sieciowa", "easy")
-mal5 = Malfunctions("Awaria zasilania", "medium")
-mal6 = Malfunctions("Brak surowców", "easy")
-mal7 = Malfunctions("Wybuch reaktora xD", "serious")
-
-mal_list = []
-mal_list.append(mal1)
-mal_list.append(mal2)
-mal_list.append(mal3)
-mal_list.append(mal4)
-mal_list.append(mal5)
-mal_list.append(mal6)
-mal_list.append(mal7)
+    def runSimulation(self, deltaTime: int, totalTime: int):
+        currentTime = 0
+        while(currentTime <= totalTime):
+            for line in self.lines:
+                if(line.get_status() == "working"):
+                    line.simulate_malfunction()
+                else:
+                    while len(line.workers) < len(self.workers) / len(self.lines):
+                        worker = self.findIdleWorker()
+                        if worker is not None:
+                            line.workers.append(worker)
+                            worker.repair(line.malfunction)
+                    for worker in line.workers:
+                        line.fix_line(deltaTime*worker.eff/100)
+                line.update_line()
+                if line.get_status() == "working":
+                    for worker in line.workers:
+                        worker.stop_working()
+                    line.workers.clear()
+                print("TIME:" + str(currentTime) + " Id:"+ str(line.id) + " status:" + str(line.get_status()))
+                if(line.get_status() != "working"):
+                    print("Remaining repair: " + str(line.timeToRepair) + "\ncurrently working on malfunction:" + str(len(line.workers)))
+                print(line)
+            currentTime += deltaTime
