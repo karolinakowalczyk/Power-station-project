@@ -10,6 +10,8 @@ class Pole:
         self.id = id
         self.status = "working"
         self.timeToRepair = 0
+        self.malfunction = None
+
     def __str__(self):
         return str(self.id) + ": " + str(self.status)
 
@@ -21,9 +23,9 @@ class Pole:
     """function uses predefined list of malfunctions and get
     a random one to happen on this pole. It changes its status accordingly
     to how serious the malfunction is"""
-    #TODO: Polaczyc z kodem Karoliny i losowac awarie
     def set_random_malfunction(self):
         malf = malfunctions.mal_list[random.randint(0,6)]
+        self.malfunction = malf
         self.set_status(malf.get_status())
         self.timeToRepair = malf.get_time()
 
@@ -41,6 +43,8 @@ class Line:
         self.polesList = list()
         self.status = "working"
         self.timeToRepair = 0
+        self.malfunction = None
+        self.workers = list()
         for i in range(poleCount):
             self.polesList.append(Pole(i))
 
@@ -79,7 +83,8 @@ class Line:
             for pole in self.polesList:
                 if not disconnected:
                     if pole.get_status() != "working":
-                        self.set_status("malfunction")
+                        self.set_status(pole.get_status())
+                        self.malfunction = pole.malfunction
                         disconnected = True
                 else:
                     pole.set_status("disconnected")
@@ -111,5 +116,3 @@ class Line:
                 pole.set_random_malfunction()
                 self.timeToRepair = pole.timeToRepair
                 break
-
-
