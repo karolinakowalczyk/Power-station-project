@@ -45,6 +45,7 @@ class Line:
         self.timeToRepair = 0
         self.malfunction = None
         self.workers = list()
+        self.poleCount = poleCount
         for i in range(poleCount):
             self.polesList.append(Pole(i))
 
@@ -69,6 +70,22 @@ class Line:
 
     def set_status(self, newStatus: str):
         self.status = newStatus
+
+    def get_pole_count(self):
+        return self.poleCount
+
+    def get_pole_list(self):
+        msg = "Line " + str(self.id) + ": " + self.status + "\n"
+        for pole in self.polesList:
+            msg += str(pole) + "\n"
+        return msg
+
+    def whether_pole_working(self):
+        for pole in self.polesList:
+            if pole.get_status() == "working":
+                return True
+            else:
+                return False
 
     """
     Function checks line status and updates it if either it was working but malfunction ocurred or

@@ -39,3 +39,6 @@ class Worker:
     def stop_working(self):
         self.status = Status.IDLE
         self.malfunction = None
+
+    def get_eff(self):
+        return self.eff
