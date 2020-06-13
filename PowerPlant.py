@@ -1,9 +1,6 @@
 import csv
 
 from Line import Line
-from collections import defaultdict
-import malfunctions
-import numpy
 import random
 from worker import Worker
 from worker import Status
@@ -45,7 +42,7 @@ class PowerPlant:
 
     def runSimulation(self, deltaTime: int, totalTime: int):
         currentTime = 0
-        self.pole_life_time = numpy.zeros((len(self.lines), self.lines[0].get_pole_count()))
+        self.pole_life_time = [[0] * (self.lines[0].get_pole_count()) for i in range(len(self.lines))]
         while (currentTime <= totalTime):
             for line in self.lines:
                 if (line.get_status() == "working"):
