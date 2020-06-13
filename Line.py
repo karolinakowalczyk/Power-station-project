@@ -80,13 +80,6 @@ class Line:
             msg += str(pole) + "\n"
         return msg
 
-    def whether_pole_working(self):
-        for pole in self.polesList:
-            if pole.get_status() == "working":
-                return True
-            else:
-                return False
-
     """
     Function checks line status and updates it if either it was working but malfunction ocurred or
     it wasnt working but is now repaired.
