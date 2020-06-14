@@ -4,8 +4,8 @@ from Data_analyser import Data_analyser
 
 case = input("If you want to simulate enter 1, if you want to analyze data enter 2. \nIf you want to quit enter 0.\n")
 #how many sims you want to run/import
-sims = 5
-
+sims = 20
+case = int(case)
 if case == 1:
     pp = PowerPlant()
     pp.generateLines(2, 20)
@@ -30,8 +30,10 @@ if case == 1:
 
 elif case == 2:
     da = Data_analyser()
-    da.load_lifetimes(5, 2, 20)
+    da.load_lifetimes(sims, 2, 20)
+    da.generate_lifetime_histogram(sims, 10)
     da.loadWorkers()
+    da.generate_workers_comparison()
 
 elif case == 0:
     SystemExit
