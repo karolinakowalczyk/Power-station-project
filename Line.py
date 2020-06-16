@@ -1,5 +1,5 @@
 import random
-
+import malfunctions
 """
 This is a class describing high voltage pole. 
 It's used for simulating malfunctions on single pole and they are aggregated inside a Line class.
@@ -9,6 +9,8 @@ class Pole:
     def __init__(self, id:int):
         self.id = id
         self.status = "working"
+        self.timeToRepair = 0
+        self.malfunction = None
 
     def __str__(self):
         return str(self.id) + ": " + str(self.status)
@@ -21,9 +23,11 @@ class Pole:
     """function uses predefined list of malfunctions and get
     a random one to happen on this pole. It changes its status accordingly
     to how serious the malfunction is"""
-    #TODO: Polaczyc z kodem Karoliny i losowac awarie
     def set_random_malfunction(self):
-        self.set_status("XD")
+        malf = malfunctions.mal_list[random.randint(0,6)]
+        self.malfunction = malf
+        self.set_status(malf.get_status())
+        self.timeToRepair = malf.get_time()
 
 """
 A class describing high voltage line.
@@ -38,6 +42,10 @@ class Line:
         Line.lineCount += 1
         self.polesList = list()
         self.status = "working"
+        self.timeToRepair = 0
+        self.malfunction = None
+        self.workers = list()
+        self.poleCount = poleCount
         for i in range(poleCount):
             self.polesList.append(Pole(i))
 
@@ -63,6 +71,15 @@ class Line:
     def set_status(self, newStatus: str):
         self.status = newStatus
 
+    def get_pole_count(self):
+        return self.poleCount
+
+    def get_pole_list(self):
+        msg = "Line " + str(self.id) + ": " + self.status + "\n"
+        for pole in self.polesList:
+            msg += str(pole) + "\n"
+        return msg
+
     """
     Function checks line status and updates it if either it was working but malfunction ocurred or
     it wasnt working but is now repaired.
@@ -76,7 +93,8 @@ class Line:
             for pole in self.polesList:
                 if not disconnected:
                     if pole.get_status() != "working":
-                        self.set_status("malfunction")
+                        self.set_status(pole.get_status())
+                        self.malfunction = pole.malfunction
                         disconnected = True
                 else:
                     pole.set_status("disconnected")
@@ -91,16 +109,20 @@ class Line:
                 self.set_status("working")
 
     #sets all posts to working status
-    def fix_line(self):
-        for pole in self.polesList:
-            pole.set_status("working")
+    def fix_line(self, deltaTime):
+        self.timeToRepair -= deltaTime
+        if(self.timeToRepair <= 0):
+            for pole in self.polesList:
+                pole.set_status("working")
+            self.set_status("working")
+        else:
+            self.set_status("work_in_progress")
 
     #rolls for malfunction on every post if line is currently working properly
     def simulate_malfunction(self):
         for pole in self.polesList:
             roll = random.randint(0, 100)
-            if roll < 11:
+            if roll < 5:
                 pole.set_random_malfunction()
+                self.timeToRepair = pole.timeToRepair
                 break
-
-
