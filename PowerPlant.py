@@ -19,15 +19,12 @@ class PowerPlant:
             self.lines.append(Line(lineSize))
 
     def tableOfPoleTimes(self, dTime: int, csvwriter):
-        csvwriter.writerow("-----------------------------------")
+        csvwriter.writerow([len(self.lines), self.lines[0].get_pole_count()])
         for i in range(0, len(self.lines)):
-            csvwriter.writerow("Linia " + str(i))
             for j in range(0, self.lines[i].get_pole_count()):
                 if self.lines[i].polesList[j].get_status() == "working":
-                    csvwriter.writerow(str(self.pole_life_time[i][j]))
                     self.pole_life_time[i][j] = self.pole_life_time[i][j] + dTime
                 else:
-                    csvwriter.writerow(str(self.pole_life_time[i][j]))
                     self.pole_life_time[i][j] = self.pole_life_time[i][j] + 0
 
     def generateWorkers(self, count: int):
@@ -65,7 +62,8 @@ class PowerPlant:
                     print("Remaining repair: " + str(line.timeToRepair) + "\ncurrently working on malfunction:" + str(
                         len(line.workers)))
                 print(line)
-            with open('poles_life_times.csv', 'a', encoding='utf-8') as csvfile:
+            with open('poles_life_times.csv', 'w', encoding='utf-8', newline='') as csvfile:
                 csvwriter = csv.writer(csvfile)
                 self.tableOfPoleTimes(deltaTime, csvwriter)
+                csvwriter.writerows(self.pole_life_time)
             currentTime += deltaTime
