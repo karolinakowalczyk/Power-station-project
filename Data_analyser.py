@@ -3,6 +3,8 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import statistics as sts
+import scipy.stats as stats
+
 
 class Data_analyser:
 
@@ -10,11 +12,9 @@ class Data_analyser:
         self.simulations = list()
         self.workersBefore = list()
         self.workersAfter = list()
-        # self.
 
     def load_lifetimes(self, simulations_count: int):
         # initiates lists on which time will be loaded
-
 
         # open files and initiate counters
         with open("poles_life_times.csv") as csv_file:
@@ -22,7 +22,7 @@ class Data_analyser:
             header = next(csv_reader)
             lines_count = int(header[0])
             poles = int(header[1])
-            #print(lines_count, poles)
+            # print(lines_count, poles)
             lines = list()
             for i in range(0, lines_count):
                 posts = list()
@@ -39,7 +39,7 @@ class Data_analyser:
             for row in csv_reader:
                 for i in range(len(row)):
                     self.simulations[current_sim][current_line][i] = int(row[i])
-                    if current_pole == poles-1:
+                    if current_pole == poles - 1:
                         current_pole = 0
                         current_line += 1
                         if current_line == lines_count:
@@ -51,7 +51,6 @@ class Data_analyser:
                     break
 
             print(self.simulations)
-
 
         # loads info about worker efficiency before and after last simulation
 
@@ -76,24 +75,22 @@ class Data_analyser:
         if pole > len(self.simulations[0][0]):
             pole = len(self.simulations[0][0]) - 1
 
-
         # lifetimes of given pole in n simulations
         y = [self.simulations[i][0][pole] for i in range(0, simulations)]
 
         n, bins, patches = plt.hist(y, 50, orientation='horizontal')
-        plt.axis((0, max(n)+1, min(y), max(y)))
-        x = np.arange(max(n)+1)
-        #plt.xticks(x)
-        #bins_labels = [str(bins[i]) + '-' + str(bins[i+1]) for i in range(len(bins)-1)]
-        #plt.yticks(bins)
+        plt.axis((0, max(n) + 1, min(y), max(y)))
+        # x = np.arange(max(n) + 1)
+        # plt.xticks(x)
+        # bins_labels = [str(bins[i]) + '-' + str(bins[i+1]) for i in range(len(bins)-1)]
+        # plt.yticks(bins)
         plt.xlabel('Wystapienia wynikow')
         plt.ylabel('Czas dzialania [min]')
-        plt.title('Histogram zycia slupka '+str(pole)+' w '+str(simulations)+' symulacjach')
-        #plt.grid(True)
-        #TODO: moze jednak przedzialy?
-        #plt.yticks(bins, bins_labels)
+        plt.title('Histogram zycia slupka ' + str(pole) + ' w ' + str(simulations) + ' symulacjach')
+        # plt.grid(True)
+        # TODO: moze jednak przedzialy?
+        # plt.yticks(bins, bins_labels)
         plt.show()
-
 
     def generate_workers_comparison(self):
 
@@ -131,6 +128,10 @@ class Data_analyser:
         return y_stdev
 
     def generate_poles_stdev(self, simulations: int, poles_per_line: int):
+
+        # validate data, if given value is too big, take max value instead
+        if len(self.simulations) < simulations:
+            simulations = len(self.simulations) - 1
 
         y = [self.stdev_pole(simulations, poles_per_line, i) for i in range(0, poles_per_line)]
 
@@ -172,6 +173,10 @@ class Data_analyser:
 
     def generate_poles_life_expectancy(self, simulations: int, poles_per_line: int):
 
+        # validate data, if given value is too big, take max value instead
+        if len(self.simulations) < simulations:
+            simulations = len(self.simulations) - 1
+
         # highly advanced two-dimensional array with nested loops which probably doesn't work
 
         y = [self.avg_life_expectancy(simulations, poles_per_line, i) for i in range(0, poles_per_line)]
@@ -194,4 +199,57 @@ class Data_analyser:
         plt.xlabel("Nr slupka")
         plt.ylabel("Sredni czas zycia [s]")
         plt.axis([0, poles_per_line, 0, max(y) * 1.25])
+        plt.show()
+
+    def generate_boxplot(self, simulations: int, pole: int):
+
+        # validate data, if given value is too big, take max value instead
+        if len(self.simulations) < simulations:
+            simulations = len(self.simulations) - 1
+        if pole > len(self.simulations[0][0]):
+            pole = len(self.simulations[0][0]) - 1
+
+        # lifetimes of given pole in n simulations
+        x = [self.simulations[i][0][pole] for i in range(0, simulations)]
+
+        # plot
+        plt.boxplot(x)
+
+        # metadata
+        plt.legend()
+        plt.title("Wykres pudełkowy")
+        plt.ylabel("średni czas życia [s]")
+        plt.show()
+
+    def generate_five_point(self, simulations:int, pole: int):
+
+        # validate data, if given value is too big, take max value instead
+        if len(self.simulations) < simulations:
+            simulations = len(self.simulations) - 1
+        if pole > len(self.simulations[0][0]):
+            pole = len(self.simulations[0][0]) - 1
+
+        # lifetimes of given pole in n simulations
+        x = [self.simulations[i][0][pole] for i in range(0, simulations)]
+
+        q0 = np.min(x)
+        q4 = np.max(x)
+        sigma = np.std(x)
+        mu = np.mean(x)
+        quartiles = np.percentile(x, [25, 50, 75])
+
+        x2 = np.linspace(mu - 4 * sigma, mu + 4 * sigma, 100)
+        plt.plot(x2, stats.norm.pdf(x2, mu, sigma), label='Rozkład normalny', c='black')
+
+        plt.axvline(q0, label='Minimum', c='b', ls='--')
+        plt.axvline(quartiles[0], label='Q1', c='g', ls='--')
+        plt.axvline(quartiles[1], label='Q2 (Mediana)', c='r', ls='--')
+        plt.axvline(quartiles[2], label='Q3', c='g', ls='--')
+        plt.axvline(q4, label='Maksimum', c='b', ls='--')
+
+        plt.title('Analiza pięciopunktowa słupka ' + str(pole) + ' w ' + str(simulations) + ' symulacjach')
+        plt.xlabel("Średni czas życia [s]")
+        plt.ylabel("Gęstość prawdopodobieństwa")
+
+        plt.legend()
         plt.show()

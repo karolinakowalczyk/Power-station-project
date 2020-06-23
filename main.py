@@ -4,7 +4,7 @@ from Data_analyser import Data_analyser
 
 case = input("If you want to simulate enter 1, if you want to analyze data enter 2. \nIf you want to quit enter 0.\n")
 # how many sims you want to run/import
-sims = 2000
+sims = 20000
 lines = 2
 poles = 20
 case = int(case)
@@ -37,8 +37,9 @@ elif case == 2:
     da = Data_analyser()
     da.load_lifetimes(sims)
     da.loadWorkers()
-
-    da.generate_lifetime_histogram(sims, 5)
+    da.generate_five_point(sims, 7)
+    da.generate_boxplot(sims, 7)
+    da.generate_lifetime_histogram(sims, 7)
     da.generate_workers_comparison()
     da.generate_poles_life_expectancy(sims, poles)
     da.generate_poles_stdev(sims, poles)
