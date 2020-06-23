@@ -126,3 +126,4 @@ class Line:
                 pole.set_random_malfunction()
                 self.timeToRepair = pole.timeToRepair
                 break
+
