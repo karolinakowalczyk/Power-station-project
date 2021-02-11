@@ -12,14 +12,14 @@ class PowerPlant:
         self.lines = list()
         self.workers = list()
         self.pole_life_time = list()
-        self.balance = 5000
 
     def generateLines(self, count: int, lineSize: int):
         for i in range(0, count):
             self.lines.append(Line(lineSize))
 
-    def tableOfPoleTimes(self, dTime: int, csvwriter):
-        csvwriter.writerow([len(self.lines), self.lines[0].get_pole_count()])
+    def tableOfPoleTimes(self, dTime: int):
+        #do it once in main, not one time each iteration
+        #csvwriter.writerow([len(self.lines), self.lines[0].get_pole_count()])
         for i in range(0, len(self.lines)):
             for j in range(0, self.lines[i].get_pole_count()):
                 if self.lines[i].polesList[j].get_status() == "working":
@@ -28,6 +28,7 @@ class PowerPlant:
                     self.pole_life_time[i][j] = self.pole_life_time[i][j] + 0
 
     def generateWorkers(self, count: int):
+        self.workers = []
         for i in range(0, count):
             self.workers.append(Worker(i, random.randint(80, 120), random.randint(20, 40)))
 
@@ -45,7 +46,7 @@ class PowerPlant:
                 if (line.get_status() == "working"):
                     line.simulate_malfunction()
                 else:
-                    while len(line.workers) < len(self.workers) / len(self.lines):
+                    while len(line.workers) < len(self.workers) // len(self.lines):
                         worker = self.findIdleWorker()
                         if worker is not None:
                             line.workers.append(worker)
@@ -57,13 +58,16 @@ class PowerPlant:
                     for worker in line.workers:
                         worker.stop_working()
                     line.workers.clear()
+                """#Prints status of all lines every deltaTime
                 print("TIME:" + str(currentTime) + " Id:" + str(line.id) + " status:" + str(line.get_status()))
                 if (line.get_status() != "working"):
                     print("Remaining repair: " + str(line.timeToRepair) + "\ncurrently working on malfunction:" + str(
                         len(line.workers)))
                 print(line)
-            with open('poles_life_times.csv', 'w', encoding='utf-8', newline='') as csvfile:
-                csvwriter = csv.writer(csvfile)
-                self.tableOfPoleTimes(deltaTime, csvwriter)
-                csvwriter.writerows(self.pole_life_time)
+                """
             currentTime += deltaTime
+            self.tableOfPoleTimes(deltaTime)
+
+        with open('poles_life_times.csv', 'a', encoding='utf-8', newline='') as csvfile:
+            csvwriter = csv.writer(csvfile)
+            csvwriter.writerows(self.pole_life_time)
